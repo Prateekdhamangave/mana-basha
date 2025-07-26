@@ -1,90 +1,102 @@
-import streamlit as st
+import streamlit as st 
 from PIL import Image
-import os
+import random
 
-with open("style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# ---------- Custom CSS Styling ---------- #
+st.markdown("""
+<style>
+    .main {
+        background-color: #fff8f0;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    h1, h2, h3 {
+        color: #8B0000;
+    }
+    .hero {
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+        padding: 30px;
+        background: linear-gradient(90deg, #ffd6d6, #ffe6b3);
+        border-radius: 12px;
+    }
+    .feature-card {
+        background-color: #fff;
+        padding: 20px;
+        margin: 10px;
+        border-radius: 16px;
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    footer {
+        text-align: center;
+        font-size: 14px;
+        padding: 10px;
+        color: #666;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# 🎨 Page Styling
-st.markdown(
-    """
-    <style>
-        .big-title {
-            text-align: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: #4B0082;
-        }
-        .subtitle {
-            text-align: center;
-            font-size: 20px;
-            color: #555;
-            margin-bottom: 40px;
-        }
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-        }
-        .card {
-            background-color: #f9f9f9;
-            border-radius: 20px;
-            padding: 20px;
-            width: 280px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .emoji {
-            font-size: 40px;
-        }
-        .card-title {
-            font-size: 22px;
-            margin: 10px 0;
-            color: #333;
-        }
-        .card-desc {
-            font-size: 16px;
-            color: #666;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# ---------- Hero Section ---------- #
+st.markdown("""
+<div class='hero'>
+    Welcome to <span style='color:#d00000'>Mana Basha</span><br>
+    Celebrating the soul of Telugu language through community stories & culture
+</div>
+""", unsafe_allow_html=True)
 
-# 💜 Title and Subtitle
-st.markdown("<div class='big-title'>మన భాష</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>A Celebration of Telugu Stories, Art & Culture 🌾</div>", unsafe_allow_html=True)
+# ---------- About Section ---------- #
+st.subheader("📜 About Mana Basha")
+st.write("""
+**Mana Basha** is a community-powered platform to collect and preserve the richness of Telugu through:
+- 🌾 Village stories
+- 🖼️ Memes & artwork
+- 🍛 Family recipes
+- 🎭 Local proverbs and dialects
+- 🧠 Traditional riddles
 
-# 👋 Welcome Text
-st.success("👋 Welcome to Mana Basha! Explore and contribute to Telugu culture by sharing stories, memes, recipes, and art.")
+Let’s keep our roots alive — one post at a time!
+""")
 
-# 🖼️ Optional: Featured Image
-banner_path = "assets/logo.png"
-if os.path.exists(banner_path):
-    st.image(banner_path, use_container_width=True)
-
-# 📦 Feature Cards
-st.markdown("<div class='card-container'>", unsafe_allow_html=True)
-
-cards = [
-    {"emoji": "📖", "title": "Share Stories", "desc": "Tell your village tales, grandma's fables, or real-life Telugu experiences."},
-    {"emoji": "🍛", "title": "Post Recipes", "desc": "Preserve and share your family’s secret recipes and dishes from your region."},
-    {"emoji": "🎨", "title": "Upload Art", "desc": "Showcase your digital or hand-made Telugu-themed art and illustrations."},
-    {"emoji": "😂", "title": "Add Memes", "desc": "Create and upload memes using Telugu language, dialects, and culture."},
-    {"emoji": "🧠", "title": "Share Riddles", "desc": "Post Telugu riddles, puzzles or proverbs unique to your area."}
+# ---------- Proverb Rotator ---------- #
+proverbs = [
+    ("చెట్టు నీడ మరిచితే చీకటే.", "If you forget the tree's shade, only darkness remains."),
+    ("అపుడు వచ్చిన తలుపు, ఇప్పుడు తీసుకోలేరు.", "The door that once came, cannot be opened now."),
+    ("అమ్మ మాటలే అసలైన ఆణిముత్యాలు.", "A mother's words are the real pearls."),
+    ("తినే నోరు ఉన్నంతవరకూ, మన పని మనమే.", "As long as we eat, our duty is ours."),
 ]
+random_proverb = random.choice(proverbs)
 
-for card in cards:
-    st.markdown(
-        f"""
-        <div class='card'>
-            <div class='emoji'>{card["emoji"]}</div>
-            <div class='card-title'>{card["title"]}</div>
-            <div class='card-desc'>{card["desc"]}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+st.markdown(f"""
+### 🧠 Telugu Proverb of the Moment:
+> "**{random_proverb[0]}**"  
+_– {random_proverb[1]}_
+""")
 
-st.markdown("</div>", unsafe_allow_html=True)
+# ---------- Feature Buttons ---------- #
+st.markdown("""---  
+### 🎯 Explore Features
+""")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.page_link("pages/Add_Story.py", label="📖 Add Story")
+    st.page_link("pages/Add_Meme.py", label="🎭 Add Meme")
+
+with col2:
+    st.page_link("pages/Add_Art.py", label="🎨 Add Art")
+    st.page_link("pages/Add_Recipe.py", label="🍲 Add Recipe")
+
+with col3:
+    st.page_link("pages/Add_Riddle.py", label="🧠 Add Riddle")
+    st.page_link("pages/About.py", label="🎤 About Project")
+
+# ---------- Footer ---------- #
+st.markdown("""
+---
+<footer>
+Made with ❤️ by Team Mana Basha <br>
+Preserve, Celebrate, Share Telugu
+</footer>
+""", unsafe_allow_html=True)

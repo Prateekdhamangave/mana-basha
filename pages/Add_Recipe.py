@@ -1,47 +1,48 @@
 import streamlit as st
 import os
+import pandas as pd
 from datetime import datetime
+from utils.rewards import award_user  # 👈 Import reward system
 
-with open("style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center; color: #D84315;'>🍛 Share a Telugu Recipe</h2>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Grandma’s secret? Dad’s signature dish? Share your family’s favorite Telugu recipe!</p>", unsafe_allow_html=True)
+st.markdown("---")
 
-st.set_page_config(page_title="Add Recipe", page_icon="🧑‍🍳")
+# Recipe Form
+with st.form("recipe_form"):
+    title = st.text_input("Recipe Title")
+    ingredients = st.text_area("Ingredients (one per line)")
+    instructions = st.text_area("Instructions / Steps", height=200)
+    author = st.text_input("Your Name (Optional)")
+    submitted = st.form_submit_button("Submit Recipe 🍲")
 
-st.markdown("## 🧑‍🍳 Share a Traditional Telugu Recipe")
-
-# Recipe title input
-recipe_title = st.text_input("🍲 Recipe Name")
-
-# Ingredients input
-ingredients = st.text_area("📝 Ingredients (list them line by line)")
-
-# Preparation steps input
-steps = st.text_area("🔥 Preparation Steps")
-
-# Image upload
-recipe_image = st.file_uploader("📸 Upload a photo of the dish", type=["jpg", "jpeg", "png"])
-
-# Submit button
-if st.button("Submit Recipe"):
-    if recipe_title and ingredients and steps:
-        # Create recipes directory if not exists
-        os.makedirs("data/recipes", exist_ok=True)
-
-        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        safe_title = recipe_title.replace(" ", "_").lower()
-
-        # Save text data
-        with open(f"data/recipes/{safe_title}_{timestamp}.txt", "w", encoding="utf-8") as f:
-            f.write(f"Title: {recipe_title}\n")
-            f.write(f"Ingredients:\n{ingredients}\n\n")
-            f.write(f"Preparation Steps:\n{steps}\n")
-
-        # Save image
-        if recipe_image:
-            img_path = f"data/recipes/{safe_title}_{timestamp}.jpg"
-            with open(img_path, "wb") as img_file:
-                img_file.write(recipe_image.read())
-
-        st.success("✅ Recipe submitted successfully!")
+# Handle Submit
+if submitted:
+    if title.strip() == "" or ingredients.strip() == "" or instructions.strip() == "":
+        st.error("Please fill in the title, ingredients, and instructions.")
     else:
-        st.warning("⚠️ Please fill all the fields before submitting.")
+        os.makedirs("data", exist_ok=True)
+        file_path = "data/recipes.csv"
+
+        new_entry = {
+            "title": title.strip(),
+            "ingredients": ingredients.strip(),
+            "instructions": instructions.strip(),
+            "author": author.strip() or "Anonymous",
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        if os.path.exists(file_path):
+            df = pd.read_csv(file_path)
+            df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
+        else:
+            df = pd.DataFrame([new_entry])
+        
+        df.to_csv(file_path, index=False)
+
+        # 🎉 Reward before success
+        reward = award_user("recipe")
+        st.info(f"🏆 You earned a badge: **{reward['badge_name_tel']} {reward['badge_emoji']}** ({reward['points']} points)")
+
+        st.success("✅ Recipe submitted successfully! Thank you for preserving Telugu food culture.")
+        st.balloons()

@@ -1,40 +1,65 @@
 import streamlit as st
-from PIL import Image
 import os
+import pandas as pd
+from datetime import datetime
+from utils.rewards import award_user
 
+# Custom CSS
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Logo (optional)
-logo_path = "assets/logo.png"
-if os.path.exists(logo_path):
-    logo = Image.open(logo_path)
-    st.image(logo, use_container_width=True)
+# Title and Instructions
+st.markdown("<h2 style='text-align: center; color: #D32F2F;'>😂 Share a Telugu Meme</h2>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Upload a funny meme in Telugu. Let the world laugh with our local flavor!</p>", unsafe_allow_html=True)
+st.markdown("---")
 
-# Title
-st.markdown("<h2 style='text-align: center; color: #FF5722;'>🤣 Share a Telugu Meme</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>Make someone laugh today with your funny Telugu meme!</p>", unsafe_allow_html=True)
+# Meme Upload Form
+with st.form("meme_form"):
+    uploader_name = st.text_input("Your Name (Optional)")
+    language = st.selectbox("Language", ["తెలుగు (Telugu)", "English", "Other"])
+    meme_file = st.file_uploader("Upload your meme (image file)", type=["jpg", "jpeg", "png"])
+    caption = st.text_area("Write a funny caption (optional)", height=100)
+    submitted = st.form_submit_button("Upload Meme 😄")
 
-# Meme creator name
-meme_creator = st.text_input("😎 Meme Creator Name (optional)")
-
-# Meme Title
-meme_title = st.text_input("🏷️ Meme Title")
-
-# Upload Meme Image
-uploaded_meme = st.file_uploader("📤 Upload your meme (JPG/PNG)", type=["jpg", "jpeg", "png"])
-
-# Optional Caption
-meme_caption = st.text_area("📝 Add a caption (optional)")
-
-# Submit button
-if st.button("Submit Meme"):
-    if meme_title and uploaded_meme:
-        st.success("✅ Meme submitted successfully!")
-        st.markdown(f"### 🏷️ {meme_title} by {meme_creator if meme_creator else 'Anonymous'}")
-        st.image(uploaded_meme, use_column_width=True)
-        if meme_caption:
-            st.markdown("#### 🗨️ Caption:")
-            st.markdown(f"<pre>{meme_caption}</pre>", unsafe_allow_html=True)
+# Save and Reward
+if submitted:
+    if meme_file is None:
+        st.error("Please upload an image file.")
     else:
-        st.error("❌ Please provide at least a title and image.")
+        # Create folder
+        os.makedirs("data/memes", exist_ok=True)
+
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        filename = f"{timestamp}_{meme_file.name}"
+        filepath = os.path.join("data/memes", filename)
+
+        # Save image
+        with open(filepath, "wb") as f:
+            f.write(meme_file.read())
+
+        # Save metadata to CSV
+        meta_path = "data/memes.csv"
+        new_entry = {
+            "filename": filename,
+            "uploader": uploader_name.strip() or "Anonymous",
+            "language": language,
+            "caption": caption.strip(),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        if os.path.exists(meta_path):
+            df = pd.read_csv(meta_path)
+            df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
+        else:
+            df = pd.DataFrame([new_entry])
+        
+        df.to_csv(meta_path, index=False)
+
+        st.success("✅ Meme uploaded successfully!")
+        st.image(filepath, width=300)
+        st.balloons()
+
+        # Reward 🎁
+        reward = award_user("meme")
+        st.info(f"🏆 You earned a badge: **{reward['badge_name_tel']} {reward['badge_emoji']}** ({reward['points']} points)")

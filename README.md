@@ -137,4 +137,3 @@ Mana Basha is more than just a platform — it is a **movement to digitize our T
 ✨ **Team TeluguNLP Sparks** presents: **Mana Basha** —
 A portal where every dialect is a voice, every story a legacy.
 
-
