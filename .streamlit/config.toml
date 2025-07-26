@@ -1,7 +1,6 @@
 [theme]
-base="light"
-primaryColor="#EF476F"
-backgroundColor="#FEF9EF"
-secondaryBackgroundColor="#F9F5F0"
-textColor="#000000"
-font="sans serif"
+primaryColor = "#F57C00"             # Deep Saffron (Indian vibe)
+backgroundColor = "#FFFBE6"          # Pale yellow
+secondaryBackgroundColor = "#FFE0B2" # Soft orange
+textColor = "#4E342E"                # Coffee brown
+font = "sans serif"
